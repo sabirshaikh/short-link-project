@@ -5,7 +5,7 @@ const URL = require("../models/url");
 
 const createShortURL = async (req, res) => {
   const shortId = nanoid(8); // Generate a unique short ID of length 8
-  console.log("redirectURL:", req);
+  console.log("redirectURL:", req.body);
   const redirectURL = req.body; // Get the original URL from the request body
 
   if (!redirectURL.url) {
@@ -13,7 +13,14 @@ const createShortURL = async (req, res) => {
   }
 
   await URL.create({ shortId, redirectURL: redirectURL.url, visitHistory: [] }); // Save the short URL to the database
-  return res.status(201).json({ shortId, redirectURL: redirectURL.url }); // Return the short ID and original URL in the response
+  return res
+    .status(201)
+    .json({ shortId, redirectURL: redirectURL.url, success: true }); // Return the short ID and original URL in the response
+};
+
+const getAllGeneratedShortURLs = async (req, res) => {
+  const urls = await URL.find({});
+  return res.json(urls);
 };
 
 const redirectURL = async (req, res, next) => {
@@ -49,4 +56,5 @@ module.exports = {
   createShortURL,
   redirectURL,
   getVisitHistory,
+  getAllGeneratedShortURLs,
 };
